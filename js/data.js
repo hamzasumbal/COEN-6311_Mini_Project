@@ -1,5 +1,11 @@
 const Employees_Data = [
     {
+        name: 'user',
+        id : 'id',
+        position : "",
+        department: ""
+    },
+    {
         name : "GM",
         id: 10001,
         position : 'General Manager',
