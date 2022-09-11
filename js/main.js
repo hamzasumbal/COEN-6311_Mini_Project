@@ -89,10 +89,9 @@ CreateTaskButton.addEventListener("click", () => {
 });
 
 const getTasks = async () => {
-  const response = await firebase.database().ref("tasks").get();
-  const data = response.val();
-  const dataArray = Object.values(data);
-  console.log(response.val());
+  firebase.database().ref("tasks").on('value',(snapshot)=>{;
+  const data = snapshot.val();
+  const dataArray = data === null? [] : Object.values(data);
 
   const AssignedTasksArray = dataArray.filter(
     (item) =>
@@ -118,11 +117,11 @@ const getTasks = async () => {
   renderTasksList("unassigned", UnassignedTasksArray);
   renderTasksList("assigned", AssignedTasksArray);
   renderTasksList("your", YourTasksArray);
+})
 };
 
 const renderTasksList = (type, tasksArray) => {
-  if (tasksArray.length > 0) {
-    console.log("remderong", type);
+
     document.querySelector(`.${type}-task-container`).innerHTML = tasksArray
       .map((task) => {
         return `
@@ -151,6 +150,7 @@ const renderTasksList = (type, tasksArray) => {
                 })}
                 </select>
                 <button class = '${type}-button-${task.taskId}'>Assign</button>
+                <button class = '${type}-delete-button-${task.taskId}'>Delete</button>
                 <br/>
                 <br/>
                 `;
@@ -172,7 +172,16 @@ const renderTasksList = (type, tasksArray) => {
           );
         });
     });
-  }
+
+    tasksArray.map((task) => {
+        document
+          .querySelector(`.${type}-delete-button-${task.taskId}`)
+          .addEventListener("click", async () => {
+            await new Task().deleteTask(
+              task.taskId);
+          });
+      });
+  
 };
 
 /* console.log(loginState); */

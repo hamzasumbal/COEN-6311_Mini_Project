@@ -32,4 +32,16 @@ class Task {
 
     }
 
+
+    async deleteTask(taskID){
+        console.log('deleting task');
+
+        try{
+            await firebase.database().ref(`tasks/${taskID}`).remove();
+        }catch{
+            alert("something went wrong. try again");
+        }
+
+    }
+
 }
