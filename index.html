@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
+    <title>Mini Project COEN 63111</title>
+</head>
+<body>
+    <header class = 'header'>
+        <h3>Task Assignment Software</h3>
+        <h4 class = 'header-employee-name'>Not Logged In</h4>
+    </header>
+
+    <div class = 'content-container'>
+    <div class = 'login-container'>
+        <label for="employee">Select Employee</label>
+        <select name="employee" id="employee" class = 'login-employee-selector'></select>
+        <button class="login-button">Login</button>
+    </div>
+    <div class = 'main-container' hidden>
+        <button class = 'hello'>Hello</button>
+        <div class = 'tasks-tables'>
+            
+            <div class = 'tasks-container'>
+                <label>UnAssigned Tasks</label>
+                <div class = 'unassigned-task-container'></div>
+            </div>
+            
+            <div class = 'tasks-container'>
+                <label>Assigned Tasks</label>
+                <div class = 'assigned-task-container'></div>
+            </div>
+
+            <div class = 'tasks-container'>
+                <label>Your Task</label>
+                <div class = 'your-task-container'></div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+    
+    <Script src="js/data.js"></Script>
+    <Script src="js/Login.js"></Script>
+    <script src="js/Employee.js"></script>
+    <script src="js/GeneralManager.js"></script>
+    <script src="js/Manager.js"></script>
+    <script src="js/Worker.js"></script>
+    <script src="js/Tasks.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
