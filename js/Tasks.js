@@ -19,13 +19,22 @@ class Task {
           }
     }
 
-    async assignTask(taskID, employee){
+    async assignTask(taskID, assignee, assignor){
 
         console.log('assigning task');
 
+        if(assignee.position === "Worker"){
+            if(!await this.canAssign(assignee.id)){
+                
+                return alert(`3 task already assigned to ${assignee.name} (${assignee.id})`)
+            }
+        }
+
         try{
-            await firebase.database().ref(`tasks/${taskID}/assignee`).set(employee);
-            await firebase.database().ref(`tasks/${taskID}/department`).set(employee.department);
+            await firebase.database().ref(`tasks/${taskID}/assignee`).set(assignee);
+            await firebase.database().ref(`tasks/${taskID}/department`).set(assignee.department);
+            await firebase.database().ref(`tasks/${taskID}/assignor`).set(assignor);
+            await firebase.database().ref(`tasks/${taskID}/status`).set('assigned');
         }catch{
             alert("something went wrong. try again");
         }
@@ -41,6 +50,30 @@ class Task {
         }catch{
             alert("something went wrong. try again");
         }
+
+    }
+
+    async changeStatus(taskID, status){
+        console.log('changing status')
+        try{
+            await firebase.database().ref(`tasks/${taskID}/status`).set(status);
+        }catch{
+            alert("something went wrong. try again");
+        }
+
+    }
+
+
+
+    async canAssign(workerId){
+
+    const snapshot =  await firebase.database().ref().child(`tasks`).get()
+      if (snapshot.exists()) {
+        let data = await snapshot.val();
+        const tasks = Object.values(data);
+        console.log('sadasdas',tasks, tasks.filter((task)=> task.assignee?.id === workerId).length < 3)
+        return tasks.filter((task)=> task.assignee?.id === workerId).length < 3? true : false;
+      };
 
     }
 
