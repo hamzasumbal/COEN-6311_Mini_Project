@@ -14,7 +14,6 @@ class GeneralManager extends Employee {
                 sender : this,
                 notificationID : id
             });
-            alert(`Notification is sent to ${recieverID}`)
             
           } catch {
             alert("something went wrong. try again");

@@ -26,6 +26,12 @@ let Employees_Data = [];
     console.log(Employees_Data);
   }
 
+  const getEmployeeNameByID = (id)=>{
+    return Employees_Data.filter((item)=>item.id === Number(id))[0].name
+ }
+
+  const notificationReceiverList = Employees_Data.filter((e)=> e.position === 'Manager' || e.position === 'General Manager')
+
   const Header = document.querySelector(".header");
   const LoginSelector = document.querySelector(".login-employee-selector");
   const LoginContainer = document.querySelector(".login-container");
@@ -122,6 +128,10 @@ let Employees_Data = [];
 
     newTask.createTask();
 
+    notificationReceiverList.map(async (item)=>{
+        await loginState.loggedInUser.sendNotification(item.id, `new task created by ${loginState.loggedInUser.name}`)
+    })
+
     taskInput.value = null;
   });
 
@@ -133,6 +143,7 @@ let Employees_Data = [];
         NotificationReceiverSelector.value,
         notification.value
       );
+      alert('notification sent!')
     } else {
       alert("no message");
     }
@@ -152,7 +163,7 @@ let Employees_Data = [];
           .map((item) => {
             return `
         <ol>
-        <li>${item.message} from ${item.sender.name} <button class = 'notification-delete-button-${item.notificationID}'>Delete</button></li>
+        <li>${item.message}. (Notification from ${item.sender.name})<button class = 'notification-delete-button-${item.notificationID}'>Delete</button></li>
         </ol>
         `;
           })
@@ -303,6 +314,9 @@ let Employees_Data = [];
             )[0],
             loginState.loggedInUser
           );
+          notificationReceiverList.map(async (item)=>{
+            await loginState.loggedInUser.sendNotification(item.id, `task "${task.task}" assigned to ${getEmployeeNameByID(assigneeEmployeeID)}`)
+        })
         });
     });
 
@@ -311,7 +325,12 @@ let Employees_Data = [];
         .querySelector(`.${type}-delete-button-${task.taskId}`)
         .addEventListener("click", async () => {
           await new Task().deleteTask(task.taskId);
+          notificationReceiverList.map(async (item)=>{
+            await loginState.loggedInUser.sendNotification(item.id, `task "${task.task}" deleted`)
+        })
         });
+
+
     });
 
     tasksArray.map((task) => {
@@ -323,3 +342,5 @@ let Employees_Data = [];
     });
   };
 })();
+
+
