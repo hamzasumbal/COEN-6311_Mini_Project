@@ -6,4 +6,7 @@ class Employee {
         this.department = department;
         this.position = position;
     }
+
+
+
 }

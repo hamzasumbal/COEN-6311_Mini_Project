@@ -116,6 +116,33 @@ body{
     margin-left: 20px;
 }
 
+.send-notification-container{
+    margin-top: 50px;
+    margin-left: 20px;
+}
+
+.send-notification-container input{
+    width: 500px;
+}
+
 .create-task-container input{
     width: 500px;
+}
+
+
+.show-notification-container{
+    border: 2px solid black;
+    padding : 20px;
+    margin-top: 20px;
+}
+
+.show-notification-container h2{
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-style: italic;
+    text-decoration: underline
+}
+
+.show-notification-container li{
+    margin-bottom: 5px;
 }

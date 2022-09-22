@@ -1,3 +1,5 @@
+// main.js is only helping with DOM Manipulations
+
 (function () {
   var firebaseConfig = {
     apiKey: keys.apiKey,
@@ -16,122 +18,197 @@ const loginState = new Login();
 
 let Employees_Data = [];
 
-(async ()=>{
-   const snapshot =  await firebase.database().ref().child(`employees`).get()
-      if (snapshot.exists()) {
-        let data = await snapshot.val();
-        Employees_Data = Object.values(data);
-        console.log(Employees_Data)
-      };
-
-const Header = document.querySelector(".header");
-const LoginSelector = document.querySelector(".login-employee-selector");
-const LoginContainer = document.querySelector(".login-container");
-const MainContainer = document.querySelector(".main-container");
-const LoginButton = document.querySelector(".login-button");
-const CreateTaskContainer = document.querySelector(".create-task-container");
-const CreateTaskButton = document.querySelector(".create-task-button");
-
-LoginSelector.innerHTML = Employees_Data.map((item) => {
-  return `<option value="${item.id}">${item.name} (${item.id})</option>`;
-});
-
-LoginButton.addEventListener("click", () => {
-  loginState.isLoggedIn = true;
-
-  const employeeSelected = Employees_Data.filter(
-    (item) => item.id === Number(LoginSelector.value)
-  )[0];
-
-  if (employeeSelected.position === "General Manager") {
-    loginState.loggedInUser = new GeneralManager(
-      employeeSelected.name,
-      employeeSelected.id,
-      employeeSelected.department,
-      employeeSelected.position
-    );
-    document.querySelector(".create-task-container").removeAttribute("hidden");
-  } else if (employeeSelected.position === "Manager") {
-    loginState.loggedInUser = new Manager(
-      employeeSelected.name,
-      employeeSelected.id,
-      employeeSelected.department,
-      employeeSelected.position
-    );
-    document.querySelector(".create-task-container").removeAttribute("hidden");
-  } else if (employeeSelected.position === "Worker") {
-    loginState.loggedInUser = new Worker(
-      employeeSelected.name,
-      employeeSelected.id,
-      employeeSelected.department,
-      employeeSelected.position
-    );
-    document.querySelector(`.tasks-container.assigned`).style.display = "none";
+(async () => {
+  const snapshot = await firebase.database().ref().child(`employees`).get();
+  if (snapshot.exists()) {
+    let data = await snapshot.val();
+    Employees_Data = Object.values(data);
+    console.log(Employees_Data);
   }
 
-  LoginContainer.style.display = "none";
-  MainContainer.removeAttribute("hidden");
-  document.querySelector(
-    ".header-employee-name"
-  ).innerHTML = `${employeeSelected.name} (${employeeSelected.id})`;
-  getTasks();
-});
-
-document.querySelector(".hello").addEventListener("click", () => {
-  console.log(loginState);
-});
-
-CreateTaskButton.addEventListener("click", () => {
-  const taskInput = document.querySelector(".create-task-input");
-
-  const task = taskInput.value;
-
-  const newTask = new Task(
-    task,
-    loginState.loggedInUser.department,
-    loginState.loggedInUser
+  const Header = document.querySelector(".header");
+  const LoginSelector = document.querySelector(".login-employee-selector");
+  const LoginContainer = document.querySelector(".login-container");
+  const MainContainer = document.querySelector(".main-container");
+  const LoginButton = document.querySelector(".login-button");
+  const CreateTaskContainer = document.querySelector(".create-task-container");
+  const CreateTaskButton = document.querySelector(".create-task-button");
+  const SendNotification = document.querySelector(
+    ".send-notification-container"
   );
-
-  newTask.createTask();
-
-  taskInput.value = null;
-  console.log(newTask);
-});
-
-const getTasks = async () => {
-  firebase.database().ref("tasks").on('value',(snapshot)=>{;
-  const data = snapshot.val();
-  const dataArray = data === null? [] : Object.values(data);
-
-  const AssignedTasksArray = dataArray.filter(
-    (item) =>
-      item.assignee &&
-      (item.department === loginState.loggedInUser.department ||
-        loginState.loggedInUser.position === "General Manager" || item.department === '*')
+  const ShowNotification = document.querySelector(
+    ".show-notification-container"
   );
-  const UnassignedTasksArray = dataArray.filter(
-    (item) =>
-      !item.assignee &&
-      (item.department === loginState.loggedInUser.department ||
-        loginState.loggedInUser.position === "General Manager" || item.department === '*')
+  const SendNotificationButton = document.querySelector(
+    ".send-notification-button"
   );
-  const YourTasksArray = dataArray.filter(
-    (item) =>
-      item.assignee?.id === loginState.loggedInUser.id &&
-      (item.department === loginState.loggedInUser.department ||
-        loginState.loggedInUser.position === "General Manager" || item.department === '*')
+  const NotificationReceiverSelector = document.querySelector(
+    ".notification-receiver-select"
   );
+  const NotificationContainer = document.querySelector(".notifications-list");
+  const notificationsList = [];
 
-  console.log(AssignedTasksArray, UnassignedTasksArray, YourTasksArray);
+  LoginSelector.innerHTML = Employees_Data.map((item) => {
+    return `<option value="${item.id}">${item.name} (${item.id})</option>`;
+  });
 
-  renderTasksList("unassigned", UnassignedTasksArray);
-  renderTasksList("assigned", AssignedTasksArray);
-  renderTasksList("your", YourTasksArray);
-})
-};
+  LoginButton.addEventListener("click", async () => {
+    loginState.isLoggedIn = true;
 
-const renderTasksList = (type, tasksArray) => {
+    const employeeSelected = Employees_Data.filter(
+      (item) => item.id === Number(LoginSelector.value)
+    )[0];
 
+    if (employeeSelected.position === "General Manager") {
+      loginState.loggedInUser = new GeneralManager(
+        employeeSelected.name,
+        employeeSelected.id,
+        employeeSelected.department,
+        employeeSelected.position,
+        employeeSelected.notifications ? employeeSelected.notifications : []
+      );
+      CreateTaskContainer.removeAttribute("hidden");
+      SendNotification.removeAttribute("hidden");
+      ShowNotification.removeAttribute("hidden");
+    } else if (employeeSelected.position === "Manager") {
+      loginState.loggedInUser = new Manager(
+        employeeSelected.name,
+        employeeSelected.id,
+        employeeSelected.department,
+        employeeSelected.position,
+        employeeSelected.notifications ? employeeSelected.notifications : []
+      );
+      CreateTaskContainer.removeAttribute("hidden");
+      SendNotification.removeAttribute("hidden");
+      ShowNotification.removeAttribute("hidden");
+    } else if (employeeSelected.position === "Worker") {
+      loginState.loggedInUser = new Worker(
+        employeeSelected.name,
+        employeeSelected.id,
+        employeeSelected.department,
+        employeeSelected.position
+      );
+      document.querySelector(`.tasks-container.assigned`).style.display =
+        "none";
+    }
+
+    NotificationReceiverSelector.innerHTML = Employees_Data.map((item) => {
+      if (item.position === "Manager" || item.position === "General Manager") {
+        return `<option value="${item.id}">${item.name} (${item.id})</option>`;
+      } else {
+        return null;
+      }
+    });
+
+    LoginContainer.style.display = "none";
+    MainContainer.removeAttribute("hidden");
+    document.querySelector(
+      ".header-employee-name"
+    ).innerHTML = `${employeeSelected.name} (${employeeSelected.id})`;
+    showTasks();
+    showNotification();
+  });
+
+  CreateTaskButton.addEventListener("click", () => {
+    const taskInput = document.querySelector(".create-task-input");
+
+    const task = taskInput.value;
+
+    const newTask = new Task(
+      task,
+      loginState.loggedInUser.department,
+      loginState.loggedInUser
+    );
+
+    newTask.createTask();
+
+    taskInput.value = null;
+  });
+
+  SendNotificationButton.addEventListener("click", async () => {
+    const notification = document.querySelector(".create-notification-input");
+
+    if (notification !== "") {
+      await loginState.loggedInUser.sendNotification(
+        NotificationReceiverSelector.value,
+        notification.value
+      );
+    } else {
+      alert("no message");
+    }
+
+    notification.value = null;
+  });
+
+  const showNotification = async () => {
+    firebase
+      .database()
+      .ref(`employees/${loginState.loggedInUser.id}/notifications`)
+      .on("value", (snapshot) => {
+        const data = snapshot.val();
+        const notificationsArray = data === null ? [] : Object.values(data);
+
+        NotificationContainer.innerHTML = notificationsArray
+          .map((item) => {
+            return `
+        <ol>
+        <li>${item.message} from ${item.sender.name} <button class = 'notification-delete-button-${item.notificationID}'>Delete</button></li>
+        </ol>
+        `;
+          })
+          .join("");
+
+        notificationsArray.map((item) => {
+          document
+            .querySelector(`.notification-delete-button-${item.notificationID}`)
+            .addEventListener("click", async () => {
+              await loginState.loggedInUser.deleteNotification(
+                item.notificationID
+              );
+            });
+        });
+      });
+  };
+
+  const showTasks = async () => {
+    firebase
+      .database()
+      .ref("tasks")
+      .on("value", (snapshot) => {
+        const data = snapshot.val();
+        const dataArray = data === null ? [] : Object.values(data);
+
+        const AssignedTasksArray = dataArray.filter(
+          (item) =>
+            item.assignee &&
+            (item.department === loginState.loggedInUser.department ||
+              loginState.loggedInUser.position === "General Manager" ||
+              item.department === "*")
+        );
+        const UnassignedTasksArray = dataArray.filter(
+          (item) =>
+            !item.assignee &&
+            (item.department === loginState.loggedInUser.department ||
+              loginState.loggedInUser.position === "General Manager" ||
+              item.department === "*")
+        );
+        const YourTasksArray = dataArray.filter(
+          (item) =>
+            item.assignee?.id === loginState.loggedInUser.id &&
+            (item.department === loginState.loggedInUser.department ||
+              loginState.loggedInUser.position === "General Manager" ||
+              item.department === "*")
+        );
+
+        console.log(AssignedTasksArray, UnassignedTasksArray, YourTasksArray);
+
+        renderTasksList("unassigned", UnassignedTasksArray);
+        renderTasksList("assigned", AssignedTasksArray);
+        renderTasksList("your", YourTasksArray);
+      });
+  };
+
+  const renderTasksList = (type, tasksArray) => {
     document.querySelector(`.${type}-task-container`).innerHTML = tasksArray
       .map((task) => {
         return `
@@ -151,33 +228,59 @@ const renderTasksList = (type, tasksArray) => {
                 
                 <p>Assign to : ${task.assignee?.name}</p>
                 <p>Assignor: ${task.assignor?.name}</p>
-                <select class = '${type}-select-${task.taskId}' ${type === 'your' && loginState.loggedInUser.position === 'Worker'? 'disabled' : ''}>
-                ${type === 'unassigned'? `<option value="">select</option>`: null}
+                <select class = '${type}-select-${task.taskId}' ${
+          type === "your" && loginState.loggedInUser.position === "Worker"
+            ? "hidden"
+            : ""
+        }>
+                ${
+                  type === "unassigned"
+                    ? `<option value="">select</option>`
+                    : null
+                }
                 ${Employees_Data.map((item) => {
+                  if (
+                    loginState.loggedInUser.id === item.id &&
+                    loginState.loggedInUser.position === "Worker"
+                  ) {
+                    return `<option value="${item.id}" ${
+                      task.assignee?.id === item.id ? "selected" : null
+                    }>${item.name} (${item.id})</option>`;
+                  }
 
-                    if(loginState.loggedInUser.department === item.department  || loginState.loggedInUser.position === "General Manager" ){
-                        return `<option value="${item.id}" ${
-                            task.assignee?.id === item.id ? "selected" : null
-                          }>${item.name} (${item.id})</option>`;
-                    }
-                    else{
-                        return null;
-                    }
-                    
+                  if (
+                    (loginState.loggedInUser.department === item.department &&
+                      loginState.loggedInUser.position === "Manager") ||
+                    loginState.loggedInUser.position === "General Manager"
+                  ) {
+                    return `<option value="${item.id}" ${
+                      task.assignee?.id === item.id ? "selected" : null
+                    }>${item.name} (${item.id})</option>`;
+                  } else {
+                    return null;
+                  }
                 })}
                 </select>
-                <button class = '${type}-button-${task.taskId}' ${type === 'your' && loginState.loggedInUser.position === 'Worker'? 'disabled' : ''}>Assign</button>
+                <button class = '${type}-button-${task.taskId}' ${
+          type === "your" && loginState.loggedInUser.position === "Worker"
+            ? "hidden"
+            : ""
+        }>Assign</button>
                 <br/>
                 <label>Status</label>
                 <select class = '${type}-status-select-${task.taskId}'>
-                ${Task_Status.map((item)=>{
-                    return `<option value="${item}" ${
-                        task.status === item ? "selected" : null
-                      }>${item}</option>`;
+                ${Task_Status.map((item) => {
+                  return `<option value="${item}" ${
+                    task.status === item ? "selected" : null
+                  }>${item}</option>`;
                 })}.join("")
                 </select>
                 <br/>
-                <button class = '${type}-delete-button-${task.taskId}' ${type === 'your' && loginState.loggedInUser.position === 'Worker'? 'disabled' : ''}>Delete</button>
+                <button class = '${type}-delete-button-${task.taskId}' ${
+          type === "your" && loginState.loggedInUser.position === "Worker"
+            ? "hidden"
+            : ""
+        }>Delete</button>
                 <br/>
                 <br/>
                 <br/>
@@ -204,23 +307,19 @@ const renderTasksList = (type, tasksArray) => {
     });
 
     tasksArray.map((task) => {
-        document
-          .querySelector(`.${type}-delete-button-${task.taskId}`)
-          .addEventListener("click", async () => {
-            await new Task().deleteTask(
-              task.taskId);
-          });
-      });
+      document
+        .querySelector(`.${type}-delete-button-${task.taskId}`)
+        .addEventListener("click", async () => {
+          await new Task().deleteTask(task.taskId);
+        });
+    });
 
-      tasksArray.map((task) => {
-        document
-          .querySelector(`.${type}-status-select-${task.taskId}`)
-          .addEventListener("change", async (event) => {
-            await new Task().changeStatus(
-              task.taskId,event.target.value);
-          });
-      });
-  
-};
-
+    tasksArray.map((task) => {
+      document
+        .querySelector(`.${type}-status-select-${task.taskId}`)
+        .addEventListener("change", async (event) => {
+          await new Task().changeStatus(task.taskId, event.target.value);
+        });
+    });
+  };
 })();
