@@ -5,5 +5,6 @@ class Login {
     }
     logout(){
         this.isLoggedIn = false;
+        location.reload();
     }
 }

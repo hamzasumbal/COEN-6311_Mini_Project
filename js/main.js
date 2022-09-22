@@ -52,7 +52,9 @@ let Employees_Data = [];
     ".notification-receiver-select"
   );
   const NotificationContainer = document.querySelector(".notifications-list");
-  const notificationsList = [];
+
+  const LogoutButton = document.querySelector('.logout-button')
+
 
   LoginSelector.innerHTML = Employees_Data.map((item) => {
     return `<option value="${item.id}">${item.name} (${item.id})</option>`;
@@ -76,6 +78,7 @@ let Employees_Data = [];
       CreateTaskContainer.removeAttribute("hidden");
       SendNotification.removeAttribute("hidden");
       ShowNotification.removeAttribute("hidden");
+      LogoutButton.removeAttribute("hidden");
     } else if (employeeSelected.position === "Manager") {
       loginState.loggedInUser = new Manager(
         employeeSelected.name,
@@ -87,6 +90,7 @@ let Employees_Data = [];
       CreateTaskContainer.removeAttribute("hidden");
       SendNotification.removeAttribute("hidden");
       ShowNotification.removeAttribute("hidden");
+      LogoutButton.removeAttribute("hidden");
     } else if (employeeSelected.position === "Worker") {
       loginState.loggedInUser = new Worker(
         employeeSelected.name,
@@ -94,8 +98,8 @@ let Employees_Data = [];
         employeeSelected.department,
         employeeSelected.position
       );
-      document.querySelector(`.tasks-container.assigned`).style.display =
-        "none";
+      document.querySelector(`.tasks-container.assigned`).style.display = "none";
+        LogoutButton.removeAttribute("hidden");
     }
 
     NotificationReceiverSelector.innerHTML = Employees_Data.map((item) => {
@@ -150,6 +154,14 @@ let Employees_Data = [];
 
     notification.value = null;
   });
+
+
+  LogoutButton.addEventListener('click',async ()=>{
+    if(loginState.isLoggedIn){
+
+        loginState.logout();
+    }
+  })
 
   const showNotification = async () => {
     firebase
