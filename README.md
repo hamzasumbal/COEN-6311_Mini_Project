@@ -12,7 +12,9 @@ A task assignment system software.
 │  │   ├── Worker 3A
 │  ├── Manager B
 │  │   ├── Worker 1B
-│  │   ├── Worker 2B   
+│  │   ├── Worker 2B
+│  │   ├── Worker 3B
+│  │   ├── Worker 4B      
 ```
 
 
@@ -31,6 +33,7 @@ A task assignment system software.
 - Managers and General Manager can send message notification to each other
 - The project is horizontally scalable meaning that more Managers and Workers can be added
 - Tasks and Employee data is stored in cloud firebase real time database
+- There is a hidden reset button in the HTML that resets the database
 
 
 
