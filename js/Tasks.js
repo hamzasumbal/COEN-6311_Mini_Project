@@ -71,7 +71,6 @@ class Task {
       if (snapshot.exists()) {
         let data = await snapshot.val();
         const tasks = Object.values(data);
-        console.log('sadasdas',tasks, tasks.filter((task)=> task.assignee?.id === workerId).length < 3)
         return tasks.filter((task)=> task.assignee?.id === workerId).length < 3? true : false;
       };
 

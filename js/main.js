@@ -23,7 +23,6 @@ let Employees_Data = [];
   if (snapshot.exists()) {
     let data = await snapshot.val();
     Employees_Data = Object.values(data);
-    console.log(Employees_Data);
   }
 
   const getEmployeeNameByID = (id)=>{
@@ -39,20 +38,11 @@ let Employees_Data = [];
   const LoginButton = document.querySelector(".login-button");
   const CreateTaskContainer = document.querySelector(".create-task-container");
   const CreateTaskButton = document.querySelector(".create-task-button");
-  const SendNotification = document.querySelector(
-    ".send-notification-container"
-  );
-  const ShowNotification = document.querySelector(
-    ".show-notification-container"
-  );
-  const SendNotificationButton = document.querySelector(
-    ".send-notification-button"
-  );
-  const NotificationReceiverSelector = document.querySelector(
-    ".notification-receiver-select"
-  );
+  const SendNotification = document.querySelector(".send-notification-container");
+  const ShowNotification = document.querySelector(".show-notification-container");
+  const SendNotificationButton = document.querySelector(".send-notification-button");
+  const NotificationReceiverSelector = document.querySelector(".notification-receiver-select");
   const NotificationContainer = document.querySelector(".notifications-list");
-
   const LogoutButton = document.querySelector('.logout-button')
 
 
@@ -102,21 +92,19 @@ let Employees_Data = [];
         LogoutButton.removeAttribute("hidden");
     }
 
-    NotificationReceiverSelector.innerHTML = Employees_Data.map((item) => {
-      if (item.position === "Manager" || item.position === "General Manager") {
-        return `<option value="${item.id}">${item.name} (${item.id})</option>`;
-      } else {
-        return null;
-      }
-    });
-
     LoginContainer.style.display = "none";
     MainContainer.removeAttribute("hidden");
-    document.querySelector(
-      ".header-employee-name"
-    ).innerHTML = `${employeeSelected.name} (${employeeSelected.id})`;
+    document.querySelector(".header-employee-name").innerHTML = `${employeeSelected.name} (${employeeSelected.id})`;
     showTasks();
     showNotification();
+  });
+
+  NotificationReceiverSelector.innerHTML = Employees_Data.map((item) => {
+    if (item.position === "Manager" || item.position === "General Manager") {
+      return `<option value="${item.id}">${item.name} (${item.id})</option>`;
+    } else {
+      return null;
+    }
   });
 
   CreateTaskButton.addEventListener("click", () => {
