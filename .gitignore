@@ -1,1 +1,6 @@
 config/keys.js
+.firebaserc
+firebase.json
+firebase-debug.log
+public
+.firebase

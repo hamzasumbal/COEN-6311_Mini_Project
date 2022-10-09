@@ -344,3 +344,17 @@ let Employees_Data = [];
 })();
 
 
+const resetData = async()=>{
+
+  //resets Employees
+  Employees_Data_t.map(async (item)=>{
+   await firebase.database().ref().child(`employees/${item.id}`).set(item);
+  })
+  //resets Tasks
+  await firebase.database().ref().child(`tasks`).set({});
+}
+
+document.querySelector('.reset-button').addEventListener('click',()=>{
+  resetData()
+})
+
