@@ -22,9 +22,11 @@ A task assignment system software.
 
 - General Manager and Manager can create Task
 - General Manager can assign task to anyone from any department
-- Manager can assign task to workers to their respective department
+- Manager can assign task to workers to their department
 - A worker can not be assigned more than 3 task at one time
-- Workers can look at the list of unassigned task of their respective department and assign themselves only
+- General Manager can see all the assigned tasks in the company
+- Manager can only see the assigned tasks of their department
+- Workers can look at the list of unassigned task of their department and assign themselves only
 - Only General Manager and Manager can cancel a task
 - A Notification is sent to General Manager and Manager when 
     - new task is created

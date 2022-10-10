@@ -22,7 +22,6 @@ class GeneralManager extends Employee {
 
 
     async deleteNotification(notificationID){
-        console.log(notificationID)
         try {
             await firebase.database().ref(`employees/${this.id}/notifications/${notificationID}`).remove();
           } catch {
