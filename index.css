@@ -80,6 +80,7 @@ body{
 .main-container {
     height: 100%;
     border: 2px black solid;
+    border-bottom: 0px;
     width: 100%;
 }
 
@@ -137,7 +138,8 @@ body{
     margin-top: 20px;
     width: 50%;
     max-height: 200px;
-    overflow: scroll;
+    overflow-x: hidden;
+    overflow-y: scroll;
 }
 
 .show-notification-container h2{
